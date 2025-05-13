@@ -86,35 +86,6 @@ void drawGroup(const Group& group) {
                     p3[i] = step.curvePoints[indices[3]][i];
                 }
 
-                // Desenhar a curva (trajetória)
-                /*glColor3f(1.0f, 1.0f, 1.0f); // branco
-                glBegin(GL_LINE_LOOP);
-                for (float gt = 0.0f; gt < 1.0f; gt += 0.01f) {
-                    float gT = gt;
-                    int gIndex = (int)(gT * pointCount);
-                    float gLocalT = (gT * pointCount) - gIndex;
-
-                    int gIndices[4] = {
-                        (gIndex + pointCount - 1) % pointCount,
-                        (gIndex + 0) % pointCount,
-                        (gIndex + 1) % pointCount,
-                        (gIndex + 2) % pointCount
-                    };
-
-                    float gp0[3], gp1[3], gp2[3], gp3[3];
-                    for (int i = 0; i < 3; i++) {
-                        gp0[i] = step.curvePoints[gIndices[0]][i];
-                        gp1[i] = step.curvePoints[gIndices[1]][i];
-                        gp2[i] = step.curvePoints[gIndices[2]][i];
-                        gp3[i] = step.curvePoints[gIndices[3]][i];
-                    }
-
-                    float posCurve[3], dummy[3];
-                    getCatmullRomPoint(gLocalT, gp0, gp1, gp2, gp3, posCurve, dummy);
-                    glVertex3f(posCurve[0], posCurve[1], posCurve[2]);
-                }
-                glEnd();*/
-
                 // Calcular posição atual
                 float pos[3], deriv[3];
                 getCatmullRomPoint(localT, p0, p1, p2, p3, pos, deriv);
