@@ -8,9 +8,9 @@ set(CMAKE_DEPENDS_LANGUAGES
 
 # The set of dependency files which are needed:
 set(CMAKE_DEPENDS_DEPENDENCY_FILES
-  "/Users/luismaia/Desktop/end/cg/trabalho/generator/generator.cpp" "CMakeFiles/generator.dir/generator/generator.cpp.o" "gcc" "CMakeFiles/generator.dir/generator/generator.cpp.o.d"
-  "/Users/luismaia/Desktop/end/cg/trabalho/generator/patchReader.cpp" "CMakeFiles/generator.dir/generator/patchReader.cpp.o" "gcc" "CMakeFiles/generator.dir/generator/patchReader.cpp.o.d"
-  "/Users/luismaia/Desktop/end/cg/trabalho/generator/primitives.cpp" "CMakeFiles/generator.dir/generator/primitives.cpp.o" "gcc" "CMakeFiles/generator.dir/generator/primitives.cpp.o.d"
+  "/Users/luismaia/Desktop/end/cg/trabalho/trabalho_cg/generator/generator.cpp" "CMakeFiles/generator.dir/generator/generator.cpp.o" "gcc" "CMakeFiles/generator.dir/generator/generator.cpp.o.d"
+  "/Users/luismaia/Desktop/end/cg/trabalho/trabalho_cg/generator/patchReader.cpp" "CMakeFiles/generator.dir/generator/patchReader.cpp.o" "gcc" "CMakeFiles/generator.dir/generator/patchReader.cpp.o.d"
+  "/Users/luismaia/Desktop/end/cg/trabalho/trabalho_cg/generator/primitives.cpp" "CMakeFiles/generator.dir/generator/primitives.cpp.o" "gcc" "CMakeFiles/generator.dir/generator/primitives.cpp.o.d"
   )
 
 # Targets to which this target links which contain Fortran sources.

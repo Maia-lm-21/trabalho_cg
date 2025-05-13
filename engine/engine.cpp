@@ -164,7 +164,19 @@ void drawGroup(const Group& group) {
     for (const auto& modelInfo : group.models) {
         Model model;
         model.file = "../models/" + modelInfo.file;
+        for (int i = 0; i < 3; i++) {
+            model.material.diffuse[i]  = modelInfo.material.diffuse[i];
+            model.material.ambient[i]  = modelInfo.material.ambient[i];
+            model.material.specular[i] = modelInfo.material.specular[i];
+            model.material.emissive[i] = modelInfo.material.emissive[i];
+        }
+        model.material.shininess = modelInfo.material.shininess;
+        model.texture.file = modelInfo.texture.file;
+    
         if (model.loadFromFile(model.file)) {
+            if (!model.texture.file.empty()) {
+                model.loadTexture(); // Aplica a textura lida do XML
+            }
             model.draw();
         }
     }
@@ -216,10 +228,39 @@ void Engine::run() {
     glutReshapeFunc(changeSize);
     glutDisplayFunc(display);
     glutIdleFunc(glutPostRedisplay);
+    glEnable(GL_RESCALE_NORMAL);
+    glEnable(GL_LIGHTING);
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
-	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     glutMainLoop();
+}
+
+void printColors(const Group& group) {
+    for (const auto& model : group.models) {
+        std::cout << "  Modelo: " << model.file 
+          << " Cor: diffuse=(" << model.material.diffuse[0] << ", " << model.material.diffuse[1] << ", " << model.material.diffuse[2] << ")"
+          << " ambient=(" << model.material.ambient[0] << ", " << model.material.ambient[1] << ", " << model.material.ambient[2] << ")"
+          << " specular=(" << model.material.specular[0] << ", " << model.material.specular[1] << ", " << model.material.specular[2] << ")"
+          << " emissive=(" << model.material.emissive[0] << ", " << model.material.emissive[1] << ", " << model.material.emissive[2] << ")"
+          << " shininess=" << model.material.shininess
+          << std::endl;
+
+    }
+    for (const auto& subgroup : group.subgroups) {
+        printColors(subgroup);
+    }
+}
+
+void printTextures(const Group& group) {
+    for (const auto& model : group.models) {
+        if (!model.texture.file.empty()) {
+            std::cout << "  Modelo: " << model.file << " usa textura: " << model.texture.file << std::endl;
+        }
+    }
+    for (const auto& subgroup : group.subgroups) {
+        printTextures(subgroup);
+    }
 }
 
 
@@ -233,6 +274,25 @@ bool Engine::init(const char* configFile) {
 
     std::cout << "Li corretamente o XML" << std::endl;
 
+    std::cout << "Texturas dos modelos:\n";
+    printTextures(config.rootGroup);
+
+
+
+std::cout << "Luzes carregadas:\n";
+for (const auto& light : config.lights) {
+    std::cout << "  Tipo: " << light.type 
+              << " Pos: (" << light.position[0] << ", " << light.position[1] << ", " << light.position[2] << ")";
+    if (light.type == "spot") {
+        std::cout << " Direção: (" << light.direction[0] << ", " << light.direction[1] << ", " << light.direction[2] << ")";
+        std::cout << " Cutoff: " << light.cutoff;
+    }
+    std::cout << std::endl;
+}
+std::cout << "Cores dos modelos:\n";
+printColors(config.rootGroup);
+
+
     // Inicialização do OpenGL
     int argc = 1;
     char* argv[1] = {(char*)""};
@@ -240,6 +300,8 @@ bool Engine::init(const char* configFile) {
     glutInitDisplayMode(GLUT_DEPTH|GLUT_DOUBLE|GLUT_RGBA);
     glutInitWindowSize(config.windowWidth, config.windowHeight);
     glutCreateWindow("3D Engine");
+
+    ilInit();
 
     // Carregar os modelos depois do contexto OpenGL estar pronto
     for (const auto& modelInfo : config.rootGroup.models) {

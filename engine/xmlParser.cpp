@@ -27,10 +27,10 @@ bool XMLParser::loadConfig(const std::string& filename, Config& config) {
     }
 
     // Ler luzes
-    /*XMLElement* lights = root->FirstChildElement("lights");
+    XMLElement* lights = root->FirstChildElement("lights");
     if (lights) {
         parseLights(lights, config);
-    }*/
+    }
 
     // Ler grupo principal
     XMLElement* group = root->FirstChildElement("group");
@@ -77,30 +77,30 @@ void XMLParser::parseCamera(XMLElement* cameraElem, Config& config) {
     }
 }
 
-/*void XMLParser::parseLights(XMLElement* lightsElem, Config& config) {
+void XMLParser::parseLights(XMLElement* lightsElem, Config& config) {
     for (XMLElement* light = lightsElem->FirstChildElement("light"); light; light = light->NextSiblingElement("light")) {
         Light l;
-        l.type = light->Attribute("type");
+        const char* type = light->Attribute("type");
+        if (type) l.type = type;
 
-        if (light->Attribute("posX")) {
-            light->QueryFloatAttribute("posX", &l.position[0]);
-            light->QueryFloatAttribute("posY", &l.position[1]);
-            light->QueryFloatAttribute("posZ", &l.position[2]);
+        if (light->Attribute("posx")) {
+            light->QueryFloatAttribute("posx", &l.position[0]);
+            light->QueryFloatAttribute("posy", &l.position[1]);
+            light->QueryFloatAttribute("posz", &l.position[2]);
         }
 
-        if (light->Attribute("dirX")) {
-            light->QueryFloatAttribute("dirX", &l.direction[0]);
-            light->QueryFloatAttribute("dirY", &l.direction[1]);
-            light->QueryFloatAttribute("dirZ", &l.direction[2]);
+        if (light->Attribute("dirx")) {
+            light->QueryFloatAttribute("dirx", &l.direction[0]);
+            light->QueryFloatAttribute("diry", &l.direction[1]);
+            light->QueryFloatAttribute("dirz", &l.direction[2]);
         }
 
         if (light->Attribute("cutoff")) {
             light->QueryFloatAttribute("cutoff", &l.cutoff);
         }
-
         config.lights.push_back(l);
     }
-}*/
+}
 
 
 void XMLParser::parseGroup(XMLElement* groupElem, Group& group) {
@@ -169,22 +169,48 @@ void XMLParser::parseTransform(XMLElement* transformElement, std::vector<Transfo
 }
 
 void XMLParser::parseModels(XMLElement* modelsElem, Group& group) {
-    if (!modelsElem) {
-        std::cerr << "Nenhum modelo encontrado no XML." << std::endl;
-        return;
-    }
-
     for (XMLElement* modelElem = modelsElem->FirstChildElement("model"); modelElem; modelElem = modelElem->NextSiblingElement("model")) {
         ModelInfo modelInfo;
         const char* file = modelElem->Attribute("file");
-        if (file) {
-            modelInfo.file = file;
-            std::cout << "Modelo lido: " << modelInfo.file << std::endl;
-            group.models.push_back(modelInfo); 
-        }
-    }
+        if (!file) continue;
 
-    if (group.models.empty()) {
-        std::cerr << "Nenhum modelo foi configurado neste grupo." << std::endl;
+        modelInfo.file = file;
+
+        // Texture
+        XMLElement* textureElem = modelElem->FirstChildElement("texture");
+        if (textureElem) {
+            const char* texFile = textureElem->Attribute("file");
+            if (texFile) {
+                modelInfo.texture.file = texFile;
+                std::cout << "Li o nome do ficheiro de textura: " << texFile << std::endl;
+            }
+        }
+
+        // Color / Material
+        XMLElement* colorElem = modelElem->FirstChildElement("color");
+        if (colorElem) {
+            auto readColor = [](XMLElement* elem, float color[3]) {
+                if (!elem) return;
+                float r = 0, g = 0, b = 0;
+                elem->QueryFloatAttribute("R", &r);
+                elem->QueryFloatAttribute("G", &g);
+                elem->QueryFloatAttribute("B", &b);
+                color[0] = r / 255.0f;
+                color[1] = g / 255.0f;
+                color[2] = b / 255.0f;
+            };
+
+            readColor(colorElem->FirstChildElement("diffuse"), modelInfo.material.diffuse);
+            readColor(colorElem->FirstChildElement("ambient"), modelInfo.material.ambient);
+            readColor(colorElem->FirstChildElement("specular"), modelInfo.material.specular);
+            readColor(colorElem->FirstChildElement("emissive"), modelInfo.material.emissive);
+
+            XMLElement* shininessElem = colorElem->FirstChildElement("shininess");
+            if (shininessElem) {
+                shininessElem->QueryFloatAttribute("value", &modelInfo.material.shininess);
+            }
+        }
+
+        group.models.push_back(modelInfo);
     }
 }

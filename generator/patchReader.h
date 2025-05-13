@@ -15,6 +15,4 @@ struct Patch {
 // Reads the patch file and fills patches and controlPoints
 bool loadPatchFile(const std::string& filename, std::vector<Patch>& patches, std::vector<Vec3>& controlPoints);
 
-
-
 #endif 

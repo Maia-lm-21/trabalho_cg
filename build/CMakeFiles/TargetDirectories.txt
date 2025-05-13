@@ -1,4 +1,4 @@
-/Users/luismaia/Desktop/end/cg/trabalho/build/CMakeFiles/engine_exec.dir
-/Users/luismaia/Desktop/end/cg/trabalho/build/CMakeFiles/generator.dir
-/Users/luismaia/Desktop/end/cg/trabalho/build/CMakeFiles/edit_cache.dir
-/Users/luismaia/Desktop/end/cg/trabalho/build/CMakeFiles/rebuild_cache.dir
+/Users/luismaia/Desktop/end/cg/trabalho/trabalho_cg/build/CMakeFiles/engine_exec.dir
+/Users/luismaia/Desktop/end/cg/trabalho/trabalho_cg/build/CMakeFiles/generator.dir
+/Users/luismaia/Desktop/end/cg/trabalho/trabalho_cg/build/CMakeFiles/edit_cache.dir
+/Users/luismaia/Desktop/end/cg/trabalho/trabalho_cg/build/CMakeFiles/rebuild_cache.dir

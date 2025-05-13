@@ -2,6 +2,7 @@
 #include <fstream>
 #include <vector>
 #include "primitives.h"
+#include "generator.h"
 
 int main (int argc, char* argv[]) {
     if (argc < 3) {
@@ -12,7 +13,7 @@ int main (int argc, char* argv[]) {
     std::string primitiva = argv[1];
     std::string nome_ficheiro;
 
-    std::vector<float> vertices;
+    std::vector<Vertex> vertices;
 
     if (primitiva == "plane") {
         nome_ficheiro = std::string(argv[1]) + "_" + std::string(argv[2]) + "_" + std::string(argv[3]) + ".3d";
@@ -42,7 +43,6 @@ int main (int argc, char* argv[]) {
         generateCone(radius, height, slices, stacks, vertices);
     }
     else if (primitiva == "patch"){
-        //<!-- generator patch teapot.patch 10 bezier_10.3d -->
         nome_ficheiro = std::string("bezier_" + std::string(argv[3]) + ".3d");
         int tesselation_num = std::stoi(argv[3]);
         std::string fich_patch = std::string(argv[2]);
@@ -53,20 +53,21 @@ int main (int argc, char* argv[]) {
         return 1;
     }
     
-    // Escrita dos vértices gerados no ficheiro
     std::ofstream file("../models/" + nome_ficheiro);
     if (!file.is_open()) {
         std::cerr << "Erro ao abrir o ficheiro: " << nome_ficheiro << std::endl;
         return 1;
     }
-    
-    
-    for (size_t i = 0; i < vertices.size(); i += 3) {
-        file << vertices[i] << " " << vertices[i+1] << " " << vertices[i+2] << std::endl;
+
+    for (const Vertex& v : vertices) {
+        file << v.x << " " << v.y << " " << v.z << " ";
+        file << v.nx << " " << v.ny << " " << v.nz << " ";
+        file << v.u << " " << v.v << std::endl;
     }
-    
+
     file.close();
     std::cout << "Ficheiro gerado com sucesso: " << nome_ficheiro << std::endl;
     
     return 0;
 }
+

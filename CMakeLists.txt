@@ -27,9 +27,19 @@ set(GENERATOR_SOURCES
 # Adicionar os frameworks necessários para macOS
 set(APPLE_FRAMEWORKS "-framework OpenGL -framework GLUT -framework Cocoa -framework IOKit -framework CoreVideo")
 
+# ------------------- DevIL config -------------------
+# Diretórios do Homebrew (ajustados manualmente)
+set(DEVIL_INCLUDE_DIR /opt/homebrew/include)
+set(DEVIL_LIBRARY /opt/homebrew/lib/libIL.dylib)
+set(ILU_LIBRARY /opt/homebrew/lib/libILU.dylib)
+set(ILUT_LIBRARY /opt/homebrew/lib/libILUT.dylib)
+
+include_directories(${DEVIL_INCLUDE_DIR})
+# ----------------------------------------------------
+
 # Criar executável do Engine
 add_executable(engine_exec ${ENGINE_SOURCES})
-target_link_libraries(engine_exec ${APPLE_FRAMEWORKS})
+target_link_libraries(engine_exec ${APPLE_FRAMEWORKS} ${DEVIL_LIBRARY} ${ILU_LIBRARY} ${ILUT_LIBRARY})
 
 # Criar executável do Generator
 add_executable(generator ${GENERATOR_SOURCES})
