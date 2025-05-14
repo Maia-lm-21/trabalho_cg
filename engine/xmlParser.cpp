@@ -195,9 +195,9 @@ void XMLParser::parseModels(XMLElement* modelsElem, Group& group) {
                 elem->QueryFloatAttribute("R", &r);
                 elem->QueryFloatAttribute("G", &g);
                 elem->QueryFloatAttribute("B", &b);
-                color[0] = r / 255.0f;
-                color[1] = g / 255.0f;
-                color[2] = b / 255.0f;
+                color[0] = r/255.0f;
+                color[1] = g/255.0f;
+                color[2] = b/255.0f;
             };
 
             readColor(colorElem->FirstChildElement("diffuse"), modelInfo.material.diffuse);

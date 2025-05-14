@@ -58,6 +58,71 @@ void changeSize(int w, int h) {
 	glMatrixMode(GL_MODELVIEW);
 }
 
+void setupLights(const std::vector<Light>& lights) {
+    glEnable(GL_LIGHTING); // Garante que a iluminação está ligada
+    float amb[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
+	glLightModelfv(GL_LIGHT_MODEL_AMBIENT, amb);
+
+    int lightIndex = 0;
+    for (const auto& light : lights) {
+        if (lightIndex >= GL_LIGHT7 - GL_LIGHT0 + 1) {
+            std::cerr << "Apenas até 8 luzes são suportadas (GL_LIGHT0 a GL_LIGHT7)." << std::endl;
+            break;
+        }
+
+        GLenum glLight = GL_LIGHT0 + lightIndex;
+        glEnable(glLight);
+        
+
+        if (light.type == "point") {
+            GLfloat pos[4] = { light.position[0], light.position[1], light.position[2], 1.0f };
+            glLightfv(glLight, GL_POSITION, pos);
+            float dark[4] = {0.2, 0.2, 0.2, 1.0};
+            float white[4] = {1.0, 1.0, 1.0, 1.0};
+            float black[4] = {0.0f, 0.0f, 0.0f, 0.0f};
+            // light colors
+            glLightfv(glLight, GL_AMBIENT, dark);
+            glLightfv(glLight, GL_DIFFUSE, white);
+            glLightfv(glLight, GL_SPECULAR, white);
+
+        } else if (light.type == "directional") {
+            GLfloat dir[4] = { light.direction[0], light.direction[1], light.direction[2], 0.0f };
+            glLightfv(glLight, GL_SPOT_DIRECTION, dir);
+            float dark[4] = {0.2, 0.2, 0.2, 1.0};
+            float white[4] = {1.0, 1.0, 1.0, 1.0};
+            float black[4] = {0.0f, 0.0f, 0.0f, 0.0f};
+            // light colors
+            glLightfv(glLight, GL_AMBIENT, dark);
+            glLightfv(glLight, GL_DIFFUSE, white);
+            glLightfv(glLight, GL_SPECULAR, white);
+
+        } else if (light.type == "spotlight") {
+            GLfloat pos[4] = { light.position[0], light.position[1], light.position[2], 1.0f };
+            GLfloat dir[] = { light.direction[0], light.direction[1], light.direction[2] };
+            glLightfv(glLight, GL_POSITION, pos);
+            glLightfv(glLight, GL_SPOT_DIRECTION, dir);
+            glLightf(glLight, GL_SPOT_CUTOFF, light.cutoff);
+            float dark[4] = {0.2, 0.2, 0.2, 1.0};
+            float white[4] = {1.0, 1.0, 1.0, 1.0};
+            float black[4] = {0.0f, 0.0f, 0.0f, 0.0f};
+            // light colors
+            glLightfv(glLight, GL_AMBIENT, dark);
+            glLightfv(glLight, GL_DIFFUSE, white);
+            glLightfv(glLight, GL_SPECULAR, white);
+        }
+
+        lightIndex++;
+    }
+}
+
+Model* findModelByFile(const std::string& file) {
+    for (Model& m : models) {
+        if (m.file == file)
+            return &m;
+    }
+    return nullptr;
+}
+
 void drawGroup(const Group& group) {
     glPushMatrix(); // Guarda a matriz de transformação atual
 
@@ -132,7 +197,7 @@ void drawGroup(const Group& group) {
     }
 
     // Desenhar os modelos do grupo atual
-    for (const auto& modelInfo : group.models) {
+    /*for (const auto& modelInfo : group.models) {
         Model model;
         model.file = "../models/" + modelInfo.file;
         for (int i = 0; i < 3; i++) {
@@ -150,7 +215,16 @@ void drawGroup(const Group& group) {
             }
             model.draw();
         }
+    }*/
+   for (const auto& modelInfo : group.models) {
+    std::string fullPath = "../models/" + modelInfo.file;
+    Model* model = findModelByFile(fullPath);
+    if (model) {
+        model->applyMaterial(); // Se você tiver essa função para aplicar material antes do draw
+        model->draw();
     }
+}
+
 
     // Chamada recursiva para os subgrupos
     for (const auto& subgroup : group.subgroups) {
@@ -175,6 +249,8 @@ void display() {
     gluLookAt(config.camera.position[0], config.camera.position[1], config.camera.position[2],
           config.camera.lookAt[0], config.camera.lookAt[1], config.camera.lookAt[2],
           config.camera.up[0], config.camera.up[1], config.camera.up[2]);
+    
+    glDisable(GL_LIGHTING);
     glBegin(GL_LINES);
 		// X axis in red
 		glColor3f(1.0f, 0.0f, 0.0f);
@@ -188,10 +264,11 @@ void display() {
 		glColor3f(0.0f, 0.0f, 1.0f);
 		glVertex3f(0.0f, 0.0f, -100.0f);
 		glVertex3f(0.0f, 0.0f, 100.0f);
-	glEnd();      
+    glEnd();
+    setupLights(config.lights);   
+    glEnable(GL_LIGHTING);
     
     drawGroup(config.rootGroup);
-    
     glutSwapBuffers();
 }
 
@@ -200,27 +277,12 @@ void Engine::run() {
     glutDisplayFunc(display);
     glutIdleFunc(glutPostRedisplay);
     glEnable(GL_RESCALE_NORMAL);
+    glEnable(GL_NORMALIZE);
     glEnable(GL_LIGHTING);
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     glutMainLoop();
-}
-
-void printColors(const Group& group) {
-    for (const auto& model : group.models) {
-        std::cout << "  Modelo: " << model.file 
-          << " Cor: diffuse=(" << model.material.diffuse[0] << ", " << model.material.diffuse[1] << ", " << model.material.diffuse[2] << ")"
-          << " ambient=(" << model.material.ambient[0] << ", " << model.material.ambient[1] << ", " << model.material.ambient[2] << ")"
-          << " specular=(" << model.material.specular[0] << ", " << model.material.specular[1] << ", " << model.material.specular[2] << ")"
-          << " emissive=(" << model.material.emissive[0] << ", " << model.material.emissive[1] << ", " << model.material.emissive[2] << ")"
-          << " shininess=" << model.material.shininess
-          << std::endl;
-
-    }
-    for (const auto& subgroup : group.subgroups) {
-        printColors(subgroup);
-    }
 }
 
 void printTextures(const Group& group) {
@@ -248,22 +310,6 @@ bool Engine::init(const char* configFile) {
     std::cout << "Texturas dos modelos:\n";
     printTextures(config.rootGroup);
 
-
-
-std::cout << "Luzes carregadas:\n";
-for (const auto& light : config.lights) {
-    std::cout << "  Tipo: " << light.type 
-              << " Pos: (" << light.position[0] << ", " << light.position[1] << ", " << light.position[2] << ")";
-    if (light.type == "spot") {
-        std::cout << " Direção: (" << light.direction[0] << ", " << light.direction[1] << ", " << light.direction[2] << ")";
-        std::cout << " Cutoff: " << light.cutoff;
-    }
-    std::cout << std::endl;
-}
-std::cout << "Cores dos modelos:\n";
-printColors(config.rootGroup);
-
-
     // Inicialização do OpenGL
     int argc = 1;
     char* argv[1] = {(char*)""};
@@ -275,7 +321,7 @@ printColors(config.rootGroup);
     ilInit();
 
     // Carregar os modelos depois do contexto OpenGL estar pronto
-    for (const auto& modelInfo : config.rootGroup.models) {
+    /*for (const auto& modelInfo : config.rootGroup.models) {
         Model modelObj;
         modelObj.file = "../models/" + modelInfo.file; 
         std::cout << modelObj.file;
@@ -285,7 +331,42 @@ printColors(config.rootGroup);
         } else {
             std::cerr << "Erro ao carregar o modelo: " << modelObj.file << std::endl;
         }
+    }*/
+   std::function<void(const Group&)> loadModelsRecursive = [&](const Group& group) {
+    for (const auto& modelInfo : group.models) {
+        std::string fullPath = "../models/" + modelInfo.file;
+        if (!findModelByFile(fullPath)) {
+            Model model;
+            model.file = fullPath;
+
+            for (int i = 0; i < 3; i++) {
+                model.material.diffuse[i]  = modelInfo.material.diffuse[i];
+                model.material.ambient[i]  = modelInfo.material.ambient[i];
+                model.material.specular[i] = modelInfo.material.specular[i];
+                model.material.emissive[i] = modelInfo.material.emissive[i];
+            }
+            model.material.shininess = modelInfo.material.shininess;
+
+            model.texture.file = modelInfo.texture.file;
+
+            if (model.loadFromFile(model.file)) {
+                if (!model.texture.file.empty()) {
+                    model.loadTexture();
+                }
+                models.push_back(model);
+                std::cout << "Carreguei modelo: " << model.file << std::endl;
+            } else {
+                std::cerr << "Erro ao carregar modelo: " << model.file << std::endl;
+            }
+        }
     }
+
+    for (const auto& subgroup : group.subgroups) {
+        loadModelsRecursive(subgroup);
+    }
+};
+
+loadModelsRecursive(config.rootGroup);
 
     return true;
 }

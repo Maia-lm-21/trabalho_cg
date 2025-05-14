@@ -36,6 +36,7 @@ public:
     Textures texture;
     bool loadFromFile(const std::string& filename);
     bool loadTexture();
+    void applyMaterial()const;
     void draw();
 };
 

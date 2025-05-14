@@ -22,7 +22,9 @@ bool Model::loadTexture() {
     unsigned char* texData = ilGetData();
 
     glGenTextures(1, &texture.texID);
+    glEnable(GL_TEXTURE_2D);
     glBindTexture(GL_TEXTURE_2D, texture.texID);
+    glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE); // <-- importante
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -61,18 +63,22 @@ bool Model::loadFromFile(const std::string& filename) {
     return true;
 }
 
+void Model::applyMaterial() const {
+    glMaterialfv(GL_FRONT, GL_DIFFUSE, material.diffuse);
+    glMaterialfv(GL_FRONT, GL_AMBIENT, material.ambient);
+    glMaterialfv(GL_FRONT, GL_SPECULAR, material.specular);
+    glMaterialfv(GL_FRONT, GL_EMISSION, material.emissive);
+    glMaterialf(GL_FRONT, GL_SHININESS, material.shininess);
+}
+
+
 void Model::draw() {
     if (vbo == 0 || vertexCount == 0) {
         std::cerr << "VBO inválido ou vazio ao tentar desenhar.\n";
         return;
     }
 
-    // Aplicar material
-    glMaterialfv(GL_FRONT, GL_DIFFUSE, material.diffuse);
-    glMaterialfv(GL_FRONT, GL_AMBIENT, material.ambient);
-    glMaterialfv(GL_FRONT, GL_SPECULAR, material.specular);
-    glMaterialfv(GL_FRONT, GL_EMISSION, material.emissive);
-    glMaterialf(GL_FRONT, GL_SHININESS, material.shininess);
+    applyMaterial();
     
     if (texture.texID != 0) {
         glEnable(GL_TEXTURE_2D);
