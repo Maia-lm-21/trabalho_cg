@@ -165,8 +165,8 @@ void generateSphere(float radius, int slices, int stacks, std::vector<Vertex>& v
         float theta2 = M_PI * (float(i + 1) / stacks);
 
         for (int j = 0; j < slices; j++) {
-            float phi1 = 2.0f * M_PI * (float(j+0.5) / slices);
-            float phi2 = 2.0f * M_PI * (float(j + 1.5) / slices);
+            float phi1 = 2.0f * M_PI * float(j) / slices;
+            float phi2 = 2.0f * M_PI * float(j + 1) / slices;
 
             float x1 = radius * sin(theta1) * cos(phi1);
             float y1 = radius * cos(theta1);
@@ -191,8 +191,8 @@ void generateSphere(float radius, int slices, int stacks, std::vector<Vertex>& v
             float nx4 = x4 / radius, ny4 = y4 / radius, nz4 = z4 / radius;
 
             // Coordenadas de textura
-            float u1 = float(j) / slices, v1 = float(i) / stacks;
-            float u2 = float(j+1) / slices, v2 = float(i+1) / stacks;
+            float u1 = phi1 / (2.0f * M_PI), v1 = theta1 / M_PI;
+            float u2 = phi2 / (2.0f * M_PI), v2 = theta2 / M_PI;
 
             // vértices dos triangulos gerados
             
@@ -255,11 +255,8 @@ void generateCone(float radius, float height, int slices, int stacks, std::vecto
             float x4 = nextRadius * cos(nextTheta);
             float z4 = nextRadius * sin(nextTheta);
     
-            // Calcular as normais dos triângulos
-            Vec3 normal1 = calculateNormal({0.0f, 0.0f, 0.0f}, {x1, currentHeight, z1}, {x2, currentHeight, z2});
-            Vec3 normal2 = calculateNormal({0.0f, 0.0f, 0.0f}, {x2, currentHeight, z2}, {x4, nextHeight, z4});
-            
-            // Normalizar as normais
+            Vec3 normal1 = {x1, radius / height, z1};
+            Vec3 normal2 = {x4, radius / height, z4};
             normalize(normal1);
             normalize(normal2);
     
@@ -312,47 +309,39 @@ void generateBezier(const std::string& patch_file, int num, std::vector<Vertex>&
     std::vector<Patch> patches;
     std::vector<Vec3> controlPoints;
 
-    //read the patch_file
     if (!loadPatchFile(patch_file, patches, controlPoints)) {
         std::cerr << "Failed to load patch file.\n";
         return;
     }
 
-    //create the vertexs and insert vertexs in the vector "vertices"
     for (const Patch& patch : patches) {
-        // Subdivide the patch into num×num grid of quads (each quad = 2 triangles)
         for (int i = 0; i < num; ++i) {
             float u0 = (float)i / num;
             float u1 = (float)(i + 1) / num;
             for (int j = 0; j < num; ++j) {
                 float v0 = (float)j / num;
                 float v1 = (float)(j + 1) / num;
-        
+
                 Vec3 p00 = evaluateBezierPatch(controlPoints, patch, u0, v0);
                 Vec3 p10 = evaluateBezierPatch(controlPoints, patch, u1, v0);
                 Vec3 p01 = evaluateBezierPatch(controlPoints, patch, u0, v1);
                 Vec3 p11 = evaluateBezierPatch(controlPoints, patch, u1, v1);
-        
-                // Cálculo das normais para os triângulos
+
                 Vec3 normal1 = calculateNormal(p00, p10, p01);
                 Vec3 normal2 = calculateNormal(p01, p10, p11);
-        
-                // Normalizar as normais
+
                 normalize(normal1);
                 normalize(normal2);
-        
-                // Coordenadas de textura
-                float uTex = u0, vTex = v0;
-        
+
                 // Triângulo 1: p01, p00, p10
-                vertices.push_back({p01.x, p01.y, p01.z, normal1.x, normal1.y, normal1.z, uTex, vTex});
-                vertices.push_back({p00.x, p00.y, p00.z, normal1.x, normal1.y, normal1.z, uTex, vTex});
-                vertices.push_back({p10.x, p10.y, p10.z, normal1.x, normal1.y, normal1.z, uTex, vTex});
-        
+                vertices.push_back({p01.x, p01.y, p01.z, normal1.x, normal1.y, normal1.z, u0, v1});
+                vertices.push_back({p00.x, p00.y, p00.z, normal1.x, normal1.y, normal1.z, u0, v0});
+                vertices.push_back({p10.x, p10.y, p10.z, normal1.x, normal1.y, normal1.z, u1, v0});
+
                 // Triângulo 2: p01, p10, p11
-                vertices.push_back({p01.x, p01.y, p01.z, normal2.x, normal2.y, normal2.z, uTex, vTex});
-                vertices.push_back({p10.x, p10.y, p10.z, normal2.x, normal2.y, normal2.z, uTex, vTex});
-                vertices.push_back({p11.x, p11.y, p11.z, normal2.x, normal2.y, normal2.z, uTex, vTex});
+                vertices.push_back({p01.x, p01.y, p01.z, normal2.x, normal2.y, normal2.z, u0, v1});
+                vertices.push_back({p10.x, p10.y, p10.z, normal2.x, normal2.y, normal2.z, u1, v0});
+                vertices.push_back({p11.x, p11.y, p11.z, normal2.x, normal2.y, normal2.z, u1, v1});
             }
         }
     }
