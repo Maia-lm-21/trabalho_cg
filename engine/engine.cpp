@@ -115,9 +115,9 @@ void setupLights(const std::vector<Light>& lights) {
     }
 }
 
-Model* findModelByFile(const std::string& file) {
+Model* findModelByFileAndTexture(const std::string& file, const std::string& textureFile) {
     for (Model& m : models) {
-        if (m.file == file)
+        if (m.file == file && m.texture.file == textureFile)
             return &m;
     }
     return nullptr;
@@ -196,30 +196,14 @@ void drawGroup(const Group& group) {
         }
     }
 
-    // Desenhar os modelos do grupo atual
-    /*for (const auto& modelInfo : group.models) {
-        Model model;
-        model.file = "../models/" + modelInfo.file;
-        for (int i = 0; i < 3; i++) {
-            model.material.diffuse[i]  = modelInfo.material.diffuse[i];
-            model.material.ambient[i]  = modelInfo.material.ambient[i];
-            model.material.specular[i] = modelInfo.material.specular[i];
-            model.material.emissive[i] = modelInfo.material.emissive[i];
-        }
-        model.material.shininess = modelInfo.material.shininess;
-        model.texture.file = modelInfo.texture.file;
     
-        if (model.loadFromFile(model.file)) {
-            if (!model.texture.file.empty()) {
-                model.loadTexture(); // Aplica a textura lida do XML
-            }
-            model.draw();
-        }
-    }*/
    for (const auto& modelInfo : group.models) {
     std::string fullPath = "../models/" + modelInfo.file;
-    Model* model = findModelByFile(fullPath);
+    std::string textureName = modelInfo.texture.file;
+    //std::cout << "infos " << modelInfo.texture.file << std::endl;
+    Model* model = findModelByFileAndTexture(fullPath, textureName);
     if (model) {
+        //std::cout << "vou imprimir: " << model->texture.file << " e " << model->texture.texID << std::endl;
         model->applyMaterial(); // Se você tiver essa função para aplicar material antes do draw
         model->draw();
     }
@@ -281,7 +265,7 @@ void Engine::run() {
     glEnable(GL_LIGHTING);
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
-	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     glutMainLoop();
 }
 
@@ -320,22 +304,10 @@ bool Engine::init(const char* configFile) {
 
     ilInit();
 
-    // Carregar os modelos depois do contexto OpenGL estar pronto
-    /*for (const auto& modelInfo : config.rootGroup.models) {
-        Model modelObj;
-        modelObj.file = "../models/" + modelInfo.file; 
-        std::cout << modelObj.file;
-        if (modelObj.loadFromFile(modelObj.file)) {
-            models.push_back(modelObj);
-            std::cout << "Carreguei o modelo: " << modelObj.file << std::endl;
-        } else {
-            std::cerr << "Erro ao carregar o modelo: " << modelObj.file << std::endl;
-        }
-    }*/
    std::function<void(const Group&)> loadModelsRecursive = [&](const Group& group) {
     for (const auto& modelInfo : group.models) {
         std::string fullPath = "../models/" + modelInfo.file;
-        if (!findModelByFile(fullPath)) {
+        
             Model model;
             model.file = fullPath;
 
@@ -348,6 +320,9 @@ bool Engine::init(const char* configFile) {
             model.material.shininess = modelInfo.material.shininess;
 
             model.texture.file = modelInfo.texture.file;
+            
+            //model.texture.texID = j;
+            
 
             if (model.loadFromFile(model.file)) {
                 if (!model.texture.file.empty()) {
@@ -355,10 +330,11 @@ bool Engine::init(const char* configFile) {
                 }
                 models.push_back(model);
                 std::cout << "Carreguei modelo: " << model.file << std::endl;
+                std::cout << "com a textura: " << model.texture.file << " e texID: " << model.texture.texID << std::endl;
             } else {
                 std::cerr << "Erro ao carregar modelo: " << model.file << std::endl;
             }
-        }
+        
     }
 
     for (const auto& subgroup : group.subgroups) {

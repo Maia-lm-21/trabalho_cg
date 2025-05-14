@@ -21,7 +21,7 @@ struct Materials {
 
 struct Textures {
     std::string file;
-    GLuint texID = 0;
+    unsigned int texID;
 };
 
 class Model {
@@ -34,6 +34,7 @@ public:
     GLuint vertexCount = 0;
     Materials material;
     Textures texture;
+    unsigned int j=0;
     bool loadFromFile(const std::string& filename);
     bool loadTexture();
     void applyMaterial()const;

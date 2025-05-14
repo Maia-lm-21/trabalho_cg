@@ -6,37 +6,49 @@
 
 bool Model::loadTexture() {
     if (texture.file.empty()) return false;
-
+    glEnable(GL_TEXTURE_2D);
+    ilEnable(IL_ORIGIN_SET);
+    ilOriginFunc(IL_ORIGIN_LOWER_LEFT);
     ILuint t;
     ilGenImages(1, &t);
     ilBindImage(t);
-    std::string path = "../test files/test_files_phase_4/" + texture.file;
+    //std::string path = "../test files/test_files_phase_4/" + texture.file;
+    std::string path = "../demo_models/" + texture.file;
     if (!ilLoadImage((ILstring)path.c_str())) {
         std::cerr << "Erro ao carregar textura: " << texture.file << std::endl;
         return false;
     }
+    std::cout << path << std::endl;
 
-    ilConvertImage(IL_RGBA, IL_UNSIGNED_BYTE);
+
+
+    //ilConvertImage(IL_RGBA, IL_UNSIGNED_BYTE);
     GLuint tw = ilGetInteger(IL_IMAGE_WIDTH);
     GLuint th = ilGetInteger(IL_IMAGE_HEIGHT);
+    ilConvertImage(IL_RGBA, IL_UNSIGNED_BYTE);
     unsigned char* texData = ilGetData();
+    std::cout << "valor do texID: " << texture.texID << std::endl;
+        std::cout << texture.file << std::endl;
 
     glGenTextures(1, &texture.texID);
-    glEnable(GL_TEXTURE_2D);
+    //j++;
+    //std::cout << "valor j: " << j << std::endl;
     glBindTexture(GL_TEXTURE_2D, texture.texID);
-    glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE); // <-- importante
+    //glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE); // <-- importante
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, tw, th, 0, GL_RGBA, GL_UNSIGNED_BYTE, texData);
+    glGenerateMipmap(GL_TEXTURE_2D);
+    glBindTexture(GL_TEXTURE_2D, 0);
 
     return true;
 }
 
 
 bool Model::loadFromFile(const std::string& filename) {
-    std::ifstream file("../models/" + filename);
+    std::ifstream file(filename);
     if (!file.is_open()) {
         std::cerr << "Erro ao abrir o arquivo do modelo: " << filename << std::endl;
         return false;
@@ -79,9 +91,10 @@ void Model::draw() {
     }
 
     applyMaterial();
-    
+    //std::cout << "Desenhando Modelo: " << file << " | texID: " << texture.texID << " | textura: " << texture.file << std::endl;
     if (texture.texID != 0) {
         glEnable(GL_TEXTURE_2D);
+        
         glBindTexture(GL_TEXTURE_2D, texture.texID);
     } else {
         glDisable(GL_TEXTURE_2D);
@@ -98,7 +111,6 @@ void Model::draw() {
     glNormalPointer(GL_FLOAT, sizeof(Vertex), (void*)offsetof(Vertex, nx));
     glTexCoordPointer(2, GL_FLOAT, sizeof(Vertex), (void*)offsetof(Vertex, s));
 
-    glColor3f(1.0f, 1.0f, 1.0f);
     glDrawArrays(GL_TRIANGLES, 0, vertexCount);
 
     glDisableClientState(GL_VERTEX_ARRAY);

@@ -1,0 +1,168 @@
+<world>
+    <window width="800" height="800" />
+    <camera>
+        <position x="-80" y="20" z="0" />
+        <lookAt x="0" y="0" z="0" />
+        <up x="-1" y="1" z="0" />
+        <projection fov="60" near="1" far="1000" />
+    </camera>
+    <group>
+        <lights>
+            <light type="point" posX="0" posY="0" posZ="0" />
+        </lights>
+        <transform>
+            <rotate angle="100" x="0" y="1" z="0" />
+        </transform>
+        <!-- Sun -->
+        <group>
+            <transform>
+                <scale x="1.5" y="1.5" z="1.5" />
+            </transform>
+            <models>
+                <model file="sphere_1_10_10.3d">
+                    <texture file="sun.jpg" />
+                    <color>
+                        <emissive R="210" G="210" B="100" />
+                        <shininess value="0" />
+                    </color>
+                </model>
+            </models>
+        </group>
+        <!-- Mercury -->
+        <group>
+            <transform>
+                <rotate time="30" x="0" y="1" z="0" />
+                <translate x="7" y="0" z="0" />
+                <scale x="0.1" y="0.1" z="0.1" />
+            </transform>
+            <models>
+                <model file="sphere_1_10_10.3d">
+                    <texture file="mercury.jpg" />
+                </model>
+            </models>
+        </group>
+        <!-- Venus -->
+        <group>
+            <transform>
+                <rotate time="60" x="0" y="1" z="0" />
+                <translate x="12" y="0" z="0" />
+                <scale x="0.3" y="0.3" z="0.3" />
+            </transform>
+            <models>
+                <model file="sphere_1_10_10.3d">
+                    <texture file="venus.jpg" />
+                </model>
+            </models>
+        </group>
+        <!-- Earth -->
+        <group>
+            <transform>
+                <rotate time="20" x="0" y="1" z="0" />
+                <translate x="17" y="0" z="0" />
+                <scale x="0.4" y="0.4" z="0.4" />
+            </transform>
+            <models>
+                <model file="sphere_1_10_10.3d">
+                    <texture file="earth.jpg" />
+                </model>
+            </models>
+            <!-- Moon -->
+            <group>
+                <transform>
+                    <rotate time="6" x="0" y="-1" z="0" />
+                    <translate x="7" y="0" z="0" />
+                    <scale x="0.3" y="0.3" z="0.3" />
+                </transform>
+                <models>
+                    <model file="sphere_1_10_10.3d">
+                        <texture file="moon.jpg" />
+                    </model>
+                </models>
+            </group>
+            <!-- Comet striking Earth -->
+            <group>
+                <transform>
+                    <translate time="28" align="True">
+                        <point x="30" y="60" z="20" />
+                        <point x="20" y="55" z="10" />
+                        <point x="10" y="50" z="5" />
+                        <point x="5" y="20" z="2" />
+                        <point x="0" y="0" z="0" />
+                    </translate>
+                    <scale x="0.4" y="0.4" z="0.4" />
+                </transform>
+                <models>
+                    <model file="bezier_15.3d">
+                        <texture file="comet.jpg" />
+                    </model>
+                </models>
+            </group>
+        </group>
+        <!-- Mars -->
+        <group>
+            <transform>
+                <rotate time="22" x="0" y="1" z="0" />
+                <translate x="-22" y="0" z="0" />
+                <scale x="0.2" y="0.2" z="0.2" />
+            </transform>
+            <models>
+                <model file="sphere_1_10_10.3d">
+                    <texture file="mars.jpg" />
+                </model>
+            </models>
+        </group>
+        <!-- Jupiter -->
+        <group>
+            <transform>
+                <rotate time="24" x="0" y="1" z="0" />
+                <translate x="29" y="0" z="0" />
+                <scale x="1" y="1" z="1" />
+            </transform>
+            <models>
+                <model file="sphere_1_10_10.3d">
+                    <texture file="jupiter.jpg" />
+                </model>
+            </models>
+        </group>
+        <!-- Saturn -->
+        <group>
+            <transform>
+                <rotate time="26" x="0" y="1" z="0" />
+                <translate x="-37" y="0" z="0" />
+                <scale x="0.9" y="0.9" z="0.9" />
+            </transform>
+            <models>
+                <model file="sphere_1_10_10.3d">
+                    <texture file="saturn.jpg" />
+                </model>
+            </models>
+            
+        </group>
+        <!-- Uranus -->
+        <group>
+            <transform>
+                <rotate time="28" x="0" y="1" z="0" />
+                <translate x="43" y="0" z="0" />
+                <scale x="0.5" y="0.5" z="0.5" />
+            </transform>
+            <models>
+                <model file="sphere_1_10_10.3d">
+                    <texture file="uranus.jpg" />
+                </model>
+            </models>
+        </group>
+        <!-- Neptune -->
+        <group>
+            <transform>
+                <rotate time="30" x="0" y="1" z="0" />
+                <translate x="-47" y="0" z="0" />
+                <scale x="0.5" y="0.5" z="0.5" />
+            </transform>
+            <models>
+                <model file="sphere_1_10_10.3d">
+                    <texture file="neptune.jpg" />
+                </model>
+            </models>
+        </group>
+    </group>
+</world>
