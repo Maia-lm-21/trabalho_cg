@@ -8,10 +8,13 @@ bool Model::loadTexture() {
     if (texture.file.empty()) return false;
     glEnable(GL_TEXTURE_2D);
     ilEnable(IL_ORIGIN_SET);
-    ilOriginFunc(IL_ORIGIN_LOWER_LEFT);
+    ilOriginFunc(IL_ORIGIN_UPPER_LEFT);
     ILuint t;
     ilGenImages(1, &t);
     ilBindImage(t);
+
+    // !!!!!!!!!!!!!!!utilizar o path de testes ou demos consoante o caso!!!!!!!!!!!!!!!!!
+
     //std::string path = "../test files/test_files_phase_4/" + texture.file;
     std::string path = "../demo_models/" + texture.file;
     if (!ilLoadImage((ILstring)path.c_str())) {
@@ -86,7 +89,7 @@ void Model::draw() {
     applyMaterial();
     if (texture.texID != 0) {
         glEnable(GL_TEXTURE_2D);
-        
+        glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
         glBindTexture(GL_TEXTURE_2D, texture.texID);
     } else {
         glDisable(GL_TEXTURE_2D);

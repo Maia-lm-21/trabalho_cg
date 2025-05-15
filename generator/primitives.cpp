@@ -165,8 +165,8 @@ void generateSphere(float radius, int slices, int stacks, std::vector<Vertex>& v
         float theta2 = M_PI * (float(i + 1) / stacks);
 
         for (int j = 0; j < slices; j++) {
-            float phi1 = 2.0f * M_PI * float(j) / slices;
-            float phi2 = 2.0f * M_PI * float(j + 1) / slices;
+            float phi1 = 2.0f * M_PI * float(j+0.5) / slices;
+            float phi2 = 2.0f * M_PI * float(j + 1.5) / slices;
 
             float x1 = radius * sin(theta1) * cos(phi1);
             float y1 = radius * cos(theta1);
@@ -189,10 +189,13 @@ void generateSphere(float radius, int slices, int stacks, std::vector<Vertex>& v
             float nx2 = x2 / radius, ny2 = y2 / radius, nz2 = z2 / radius;
             float nx3 = x3 / radius, ny3 = y3 / radius, nz3 = z3 / radius;
             float nx4 = x4 / radius, ny4 = y4 / radius, nz4 = z4 / radius;
+            
+            //coordenadas de textura
+            float u1 = 1.0f - (phi1 / (2.0f * M_PI));
+            float u2 = 1.0f - (phi2 / (2.0f * M_PI));
+            float v1 = theta1 / M_PI;
+            float v2 = theta2 / M_PI;
 
-            // Coordenadas de textura
-            float u1 = phi1 / (2.0f * M_PI), v1 = theta1 / M_PI;
-            float u2 = phi2 / (2.0f * M_PI), v2 = theta2 / M_PI;
 
             // vértices dos triangulos gerados
             
@@ -210,73 +213,76 @@ void generateSphere(float radius, int slices, int stacks, std::vector<Vertex>& v
 }
 
 
-
-
 void generateCone(float radius, float height, int slices, int stacks, std::vector<Vertex>& vertices) {
-    float stackHeight = height / stacks;
-    float angleStep = 2 * M_PI / slices;
-    float radiusStep = radius / stacks;
+    vertices.clear();
 
-    // Base do cone
+    float stackHeight = height / stacks;
+    float angleStep = 2.0f * M_PI / slices;
+    float radiusStep = radius / stacks;
+    float slantHeight = sqrt(height * height + radius * radius);
+
+    // Base do cone (normal para baixo)
     for (int i = 0; i < slices; i++) {
         float theta = i * angleStep;
-        float nextTheta = (float(i + 1)) * angleStep;
+        float nextTheta = (i + 1) * angleStep;
 
         // Centro da base
         vertices.push_back({0.0f, 0.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.5f, 0.5f});
-        
-        // Ponto no círculo atual
+
+        // Pontos na borda da base
         vertices.push_back({radius * cos(theta), 0.0f, radius * sin(theta), 0.0f, -1.0f, 0.0f, float(i) / slices, 0.0f});
-        
-        // Próximo ponto no círculo
         vertices.push_back({radius * cos(nextTheta), 0.0f, radius * sin(nextTheta), 0.0f, -1.0f, 0.0f, float(i + 1) / slices, 0.0f});
     }
 
-    // Superfícies laterais do cone
+    // Superfície lateral do cone
     for (int j = 0; j < stacks; j++) {
-        float currentHeight = float(j) * stackHeight;
-        float nextHeight = float(j + 1) * stackHeight;
-        float currentRadius = radius - float(j) * radiusStep;
-        float nextRadius = radius - float(j + 1) * radiusStep;
-    
+        float currentHeight = j * stackHeight;
+        float nextHeight = (j + 1) * stackHeight;
+        float currentRadius = radius - j * radiusStep;
+        float nextRadius = radius - (j + 1) * radiusStep;
+
         for (int i = 0; i < slices; i++) {
-            float theta = float(i) * angleStep;
-            float nextTheta = (float(i + 1)) * angleStep;
-    
+            float theta = i * angleStep;
+            float nextTheta = (i + 1) * angleStep;
+
             // Vértices da stack atual
             float x1 = currentRadius * cos(theta);
             float z1 = currentRadius * sin(theta);
             float x2 = currentRadius * cos(nextTheta);
             float z2 = currentRadius * sin(nextTheta);
-    
+
             // Vértices da próxima stack
             float x3 = nextRadius * cos(theta);
             float z3 = nextRadius * sin(theta);
             float x4 = nextRadius * cos(nextTheta);
             float z4 = nextRadius * sin(nextTheta);
-    
-            Vec3 normal1 = {x1, radius / height, z1};
-            Vec3 normal2 = {x4, radius / height, z4};
-            normalize(normal1);
-            normalize(normal2);
-    
+
+            // Normais laterais (suavizadas)
+            float nx1 = (height / slantHeight) * cos(theta);
+            float ny1 = radius / slantHeight;
+            float nz1 = (height / slantHeight) * sin(theta);
+
+            float nx2 = (height / slantHeight) * cos(nextTheta);
+            float ny2 = radius / slantHeight;
+            float nz2 = (height / slantHeight) * sin(nextTheta);
+
             // Coordenadas de textura
             float u1 = float(i) / slices;
             float u2 = float(i + 1) / slices;
-    
-            // Triângulos laterais
-            vertices.push_back({x1, currentHeight, z1, normal1.x, normal1.y, normal1.z, u1, float(j) / stacks});
-            vertices.push_back({x3, nextHeight, z3, normal2.x, normal2.y, normal2.z, u1, float(j + 1) / stacks});
-            vertices.push_back({x4, nextHeight, z4, normal2.x, normal2.y, normal2.z, u2, float(j + 1) / stacks});
 
-            vertices.push_back({x2, currentHeight, z2, normal1.x, normal1.y, normal1.z, u2, float(j) / stacks});
-            vertices.push_back({x1, currentHeight, z1, normal1.x, normal1.y, normal1.z, u1, float(j) / stacks});
-            vertices.push_back({x4, nextHeight, z4, normal2.x, normal2.y, normal2.z, u2, float(j + 1) / stacks});
-            
-            
+            // Primeiro triângulo da face lateral
+            vertices.push_back({x1, currentHeight, z1, nx1, ny1, nz1, u1, float(j) / stacks});
+            vertices.push_back({x3, nextHeight, z3, nx1, ny1, nz1, u1, float(j + 1) / stacks});
+            vertices.push_back({x4, nextHeight, z4, nx2, ny2, nz2, u2, float(j + 1) / stacks});
+
+            // Segundo triângulo da face lateral
+            vertices.push_back({x2, currentHeight, z2, nx2, ny2, nz2, u2, float(j) / stacks});
+            vertices.push_back({x1, currentHeight, z1, nx1, ny1, nz1, u1, float(j) / stacks});
+            vertices.push_back({x4, nextHeight, z4, nx2, ny2, nz2, u2, float(j + 1) / stacks});
         }
     }
 }
+
 
  // Compute Bernstein basis for cubic Bezier
 float bernstein(int i, float t) {
@@ -287,6 +293,48 @@ float bernstein(int i, float t) {
         case 3: return t * t * t;
         default: return 0;
     }
+}
+
+float bernsteinDerivative(int i, float t) {
+    switch (i) {
+        case 0: return -3 * (1 - t) * (1 - t);
+        case 1: return 3 * (1 - t) * (1 - t) - 6 * t * (1 - t);
+        case 2: return 6 * t * (1 - t) - 3 * t * t;
+        case 3: return 3 * t * t;
+        default: return 0;
+    }
+}
+
+struct Vec3Derivatives {
+    Vec3 du;
+    Vec3 dv;
+};
+
+Vec3Derivatives evaluateBezierPatchDerivatives(const std::vector<Vec3>& controlPoints, const Patch& patch, float u, float v) {
+    Vec3 du = {0, 0, 0};
+    Vec3 dv = {0, 0, 0};
+
+    for (int i = 0; i < 4; ++i) {
+        float bu = bernstein(i, u);
+        float dbu = bernsteinDerivative(i, u);
+        for (int j = 0; j < 4; ++j) {
+            float bv = bernstein(j, v);
+            float dbv = bernsteinDerivative(j, v);
+            int idx = patch.controlPointIndices[j * 4 + i];
+
+           
+            du.x += dbu * bv * controlPoints[idx].x;
+            du.y += dbu * bv * controlPoints[idx].y;
+            du.z += dbu * bv * controlPoints[idx].z;
+
+            
+            dv.x += bu * dbv * controlPoints[idx].x;
+            dv.y += bu * dbv * controlPoints[idx].y;
+            dv.z += bu * dbv * controlPoints[idx].z;
+        }
+    }
+
+    return {du, dv};
 }
 
 // Evaluate position on a patch at (u, v)
@@ -305,6 +353,14 @@ Vec3 evaluateBezierPatch(const std::vector<Vec3>& controlPoints, const Patch& pa
     return p;
 }
 
+Vec3 cross(const Vec3& a, const Vec3& b) {
+    return Vec3 {
+        a.y * b.z - a.z * b.y,
+        a.z * b.x - a.x * b.z,
+        a.x * b.y - a.y * b.x
+    };
+}
+
 void generateBezier(const std::string& patch_file, int num, std::vector<Vertex>& vertices) {
     std::vector<Patch> patches;
     std::vector<Vec3> controlPoints;
@@ -316,32 +372,41 @@ void generateBezier(const std::string& patch_file, int num, std::vector<Vertex>&
 
     for (const Patch& patch : patches) {
         for (int i = 0; i < num; ++i) {
-            float u0 = (float)i / num;
-            float u1 = (float)(i + 1) / num;
+            float u0 = float(i) / num;
+            float u1 = float(i + 1) / num;
             for (int j = 0; j < num; ++j) {
-                float v0 = (float)j / num;
-                float v1 = (float)(j + 1) / num;
+                float v0 = float(j) / num;
+                float v1 = float(j + 1) / num;
 
                 Vec3 p00 = evaluateBezierPatch(controlPoints, patch, u0, v0);
                 Vec3 p10 = evaluateBezierPatch(controlPoints, patch, u1, v0);
                 Vec3 p01 = evaluateBezierPatch(controlPoints, patch, u0, v1);
                 Vec3 p11 = evaluateBezierPatch(controlPoints, patch, u1, v1);
 
-                Vec3 normal1 = calculateNormal(p00, p10, p01);
-                Vec3 normal2 = calculateNormal(p01, p10, p11);
+                Vec3Derivatives d00 = evaluateBezierPatchDerivatives(controlPoints, patch, u0, v0);
+                Vec3Derivatives d10 = evaluateBezierPatchDerivatives(controlPoints, patch, u1, v0);
+                Vec3Derivatives d01 = evaluateBezierPatchDerivatives(controlPoints, patch, u0, v1);
+                Vec3Derivatives d11 = evaluateBezierPatchDerivatives(controlPoints, patch, u1, v1);
 
-                normalize(normal1);
-                normalize(normal2);
+                Vec3 normal00 = cross(d00.du, d00.dv);
+                Vec3 normal10 = cross(d10.du, d10.dv);
+                Vec3 normal01 = cross(d01.du, d01.dv);
+                Vec3 normal11 = cross(d11.du, d11.dv);
+
+                normalize(normal00);
+                normalize(normal10);
+                normalize(normal01);
+                normalize(normal11);
 
                 // Triângulo 1: p01, p00, p10
-                vertices.push_back({p01.x, p01.y, p01.z, normal1.x, normal1.y, normal1.z, u0, v1});
-                vertices.push_back({p00.x, p00.y, p00.z, normal1.x, normal1.y, normal1.z, u0, v0});
-                vertices.push_back({p10.x, p10.y, p10.z, normal1.x, normal1.y, normal1.z, u1, v0});
+                vertices.push_back({p01.x, p01.y, p01.z, normal01.x, normal01.y, normal01.z, u0, v1});
+                vertices.push_back({p00.x, p00.y, p00.z, normal00.x, normal00.y, normal00.z, u0, v0});
+                vertices.push_back({p10.x, p10.y, p10.z, normal10.x, normal10.y, normal10.z, u1, v0});
 
                 // Triângulo 2: p01, p10, p11
-                vertices.push_back({p01.x, p01.y, p01.z, normal2.x, normal2.y, normal2.z, u0, v1});
-                vertices.push_back({p10.x, p10.y, p10.z, normal2.x, normal2.y, normal2.z, u1, v0});
-                vertices.push_back({p11.x, p11.y, p11.z, normal2.x, normal2.y, normal2.z, u1, v1});
+                vertices.push_back({p01.x, p01.y, p01.z, normal01.x, normal01.y, normal01.z, u0, v1});
+                vertices.push_back({p10.x, p10.y, p10.z, normal10.x, normal10.y, normal10.z, u1, v0});
+                vertices.push_back({p11.x, p11.y, p11.z, normal11.x, normal11.y, normal11.z, u1, v1});
             }
         }
     }

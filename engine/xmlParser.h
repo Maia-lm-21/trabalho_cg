@@ -7,11 +7,11 @@
 #include "../external/tinyxml2.h"
 
 struct Material {
-    float diffuse[3] = {200,200,200}; 
-    float ambient[3] = {50,50,50};
-    float specular[3] = {0,0,0};
-    float emissive[3] = {0,0,0};
-    float shininess = 0.0f;
+    float diffuse[3] = {1.0f, 1.0f, 1.0f};   // Branco, reage bem à luz
+    float ambient[3] = {0.2f, 0.2f, 0.2f};   // Luz ambiente fraca
+    float specular[3] = {0.5f, 0.5f, 0.5f};  // Algum brilho
+    float emissive[3] = {0.0f, 0.0f, 0.0f};  // Sem autoiluminação (exceto o Sol)
+    float shininess = 32.0f;                // Brilho moderado
 };
 
 struct Texture {

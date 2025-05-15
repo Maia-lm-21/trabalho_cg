@@ -77,38 +77,30 @@ void setupLights(const std::vector<Light>& lights) {
         if (light.type == "point") {
             GLfloat pos[4] = { light.position[0], light.position[1], light.position[2], 1.0f };
             glLightfv(glLight, GL_POSITION, pos);
-            float dark[4] = {0.2, 0.2, 0.2, 1.0};
             float white[4] = {1.0, 1.0, 1.0, 1.0};
-            float black[4] = {0.0f, 0.0f, 0.0f, 0.0f};
-            // light colors
-            glLightfv(glLight, GL_AMBIENT, dark);
             glLightfv(glLight, GL_DIFFUSE, white);
             glLightfv(glLight, GL_SPECULAR, white);
+            glLightf(glLight, GL_CONSTANT_ATTENUATION, 1.0f);     // default
+            glLightf(glLight, GL_LINEAR_ATTENUATION, 0.001f);
+            glLightf(glLight, GL_QUADRATIC_ATTENUATION, 0.0001f);   // ajusta como quiseres
 
         } else if (light.type == "directional") {
             GLfloat dir[4] = { light.direction[0], light.direction[1], light.direction[2], 0.0f };
-            glLightfv(glLight, GL_SPOT_DIRECTION, dir);
-            float dark[4] = {0.2, 0.2, 0.2, 1.0};
+            glLightfv(glLight, GL_POSITION, dir); // Usa direção com w = 0 para luz direcional
             float white[4] = {1.0, 1.0, 1.0, 1.0};
-            float black[4] = {0.0f, 0.0f, 0.0f, 0.0f};
-            // light colors
-            glLightfv(glLight, GL_AMBIENT, dark);
             glLightfv(glLight, GL_DIFFUSE, white);
             glLightfv(glLight, GL_SPECULAR, white);
 
-        } else if (light.type == "spotlight") {
+        } else if (light.type == "spot") {
             GLfloat pos[4] = { light.position[0], light.position[1], light.position[2], 1.0f };
             GLfloat dir[] = { light.direction[0], light.direction[1], light.direction[2] };
             glLightfv(glLight, GL_POSITION, pos);
             glLightfv(glLight, GL_SPOT_DIRECTION, dir);
             glLightf(glLight, GL_SPOT_CUTOFF, light.cutoff);
-            float dark[4] = {0.2, 0.2, 0.2, 1.0};
             float white[4] = {1.0, 1.0, 1.0, 1.0};
-            float black[4] = {0.0f, 0.0f, 0.0f, 0.0f};
-            // light colors
-            glLightfv(glLight, GL_AMBIENT, dark);
             glLightfv(glLight, GL_DIFFUSE, white);
             glLightfv(glLight, GL_SPECULAR, white);
+            glLightf(glLight, GL_SPOT_EXPONENT, 10.0f); // concentra mais no centro (0 a 128)
         }
 
         lightIndex++;
@@ -202,7 +194,6 @@ void drawGroup(const Group& group) {
     std::string textureName = modelInfo.texture.file;
     Model* model = findModelByFileAndTexture(fullPath, textureName);
     if (model) {
-        model->applyMaterial(); // Se você tiver essa função para aplicar material antes do draw
         model->draw();
     }
 }
@@ -247,8 +238,8 @@ void display() {
 		glVertex3f(0.0f, 0.0f, -100.0f);
 		glVertex3f(0.0f, 0.0f, 100.0f);
     glEnd();
-    setupLights(config.lights);   
     glEnable(GL_LIGHTING);
+    setupLights(config.lights);   
     
     drawGroup(config.rootGroup);
     glutSwapBuffers();
@@ -260,7 +251,6 @@ void Engine::run() {
     glutIdleFunc(glutPostRedisplay);
     glEnable(GL_RESCALE_NORMAL);
     glEnable(GL_NORMALIZE);
-    glEnable(GL_LIGHTING);
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
