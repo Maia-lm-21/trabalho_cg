@@ -200,10 +200,8 @@ void drawGroup(const Group& group) {
    for (const auto& modelInfo : group.models) {
     std::string fullPath = "../models/" + modelInfo.file;
     std::string textureName = modelInfo.texture.file;
-    //std::cout << "infos " << modelInfo.texture.file << std::endl;
     Model* model = findModelByFileAndTexture(fullPath, textureName);
     if (model) {
-        //std::cout << "vou imprimir: " << model->texture.file << " e " << model->texture.texID << std::endl;
         model->applyMaterial(); // Se você tiver essa função para aplicar material antes do draw
         model->draw();
     }
@@ -330,7 +328,6 @@ bool Engine::init(const char* configFile) {
                 }
                 models.push_back(model);
                 std::cout << "Carreguei modelo: " << model.file << std::endl;
-                std::cout << "com a textura: " << model.texture.file << " e texID: " << model.texture.texID << std::endl;
             } else {
                 std::cerr << "Erro ao carregar modelo: " << model.file << std::endl;
             }

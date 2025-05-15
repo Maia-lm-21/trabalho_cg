@@ -16,7 +16,7 @@
         <!-- Sun -->
         <group>
             <transform>
-                <scale x="1.5" y="1.5" z="1.5" />
+                <scale x="3" y="3" z="3" />
             </transform>
             <models>
                 <model file="sphere_1_10_10.3d">
@@ -33,7 +33,7 @@
             <transform>
                 <rotate time="30" x="0" y="1" z="0" />
                 <translate x="7" y="0" z="0" />
-                <scale x="0.1" y="0.1" z="0.1" />
+                <scale x="0.5" y="0.5" z="0.5" />
             </transform>
             <models>
                 <model file="sphere_1_10_10.3d">
@@ -46,7 +46,7 @@
             <transform>
                 <rotate time="60" x="0" y="1" z="0" />
                 <translate x="12" y="0" z="0" />
-                <scale x="0.3" y="0.3" z="0.3" />
+                <scale x="0.7" y="0.7" z="0.7" />
             </transform>
             <models>
                 <model file="sphere_1_10_10.3d">
@@ -59,7 +59,7 @@
             <transform>
                 <rotate time="20" x="0" y="1" z="0" />
                 <translate x="17" y="0" z="0" />
-                <scale x="0.4" y="0.4" z="0.4" />
+                <scale x="0.9" y="0.9" z="0.9" />
             </transform>
             <models>
                 <model file="sphere_1_10_10.3d">
@@ -89,7 +89,7 @@
                         <point x="5" y="20" z="2" />
                         <point x="0" y="0" z="0" />
                     </translate>
-                    <scale x="0.4" y="0.4" z="0.4" />
+                    <scale x="0.2" y="0.2" z="0.2" />
                 </transform>
                 <models>
                     <model file="bezier_15.3d">
@@ -103,7 +103,7 @@
             <transform>
                 <rotate time="22" x="0" y="1" z="0" />
                 <translate x="-22" y="0" z="0" />
-                <scale x="0.2" y="0.2" z="0.2" />
+                <scale x="0.7" y="0.7" z="0.7" />
             </transform>
             <models>
                 <model file="sphere_1_10_10.3d">
@@ -116,7 +116,7 @@
             <transform>
                 <rotate time="24" x="0" y="1" z="0" />
                 <translate x="29" y="0" z="0" />
-                <scale x="1" y="1" z="1" />
+                <scale x="1.6" y="1.6" z="1.6" />
             </transform>
             <models>
                 <model file="sphere_1_10_10.3d">
@@ -129,7 +129,7 @@
             <transform>
                 <rotate time="26" x="0" y="1" z="0" />
                 <translate x="-37" y="0" z="0" />
-                <scale x="0.9" y="0.9" z="0.9" />
+                <scale x="1.2" y="1.2" z="1.2" />
             </transform>
             <models>
                 <model file="sphere_1_10_10.3d">
@@ -143,7 +143,7 @@
             <transform>
                 <rotate time="28" x="0" y="1" z="0" />
                 <translate x="43" y="0" z="0" />
-                <scale x="0.5" y="0.5" z="0.5" />
+                <scale x="0.9" y="0.9" z="0.9" />
             </transform>
             <models>
                 <model file="sphere_1_10_10.3d">
@@ -156,7 +156,7 @@
             <transform>
                 <rotate time="30" x="0" y="1" z="0" />
                 <translate x="-47" y="0" z="0" />
-                <scale x="0.5" y="0.5" z="0.5" />
+                <scale x="0.9" y="0.9" z="0.9" />
             </transform>
             <models>
                 <model file="sphere_1_10_10.3d">

@@ -18,23 +18,16 @@ bool Model::loadTexture() {
         std::cerr << "Erro ao carregar textura: " << texture.file << std::endl;
         return false;
     }
-    std::cout << path << std::endl;
-
-
 
     //ilConvertImage(IL_RGBA, IL_UNSIGNED_BYTE);
     GLuint tw = ilGetInteger(IL_IMAGE_WIDTH);
     GLuint th = ilGetInteger(IL_IMAGE_HEIGHT);
     ilConvertImage(IL_RGBA, IL_UNSIGNED_BYTE);
     unsigned char* texData = ilGetData();
-    std::cout << "valor do texID: " << texture.texID << std::endl;
-        std::cout << texture.file << std::endl;
 
     glGenTextures(1, &texture.texID);
-    //j++;
-    //std::cout << "valor j: " << j << std::endl;
     glBindTexture(GL_TEXTURE_2D, texture.texID);
-    //glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE); // <-- importante
+    glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE); // <-- importante
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -91,7 +84,6 @@ void Model::draw() {
     }
 
     applyMaterial();
-    //std::cout << "Desenhando Modelo: " << file << " | texID: " << texture.texID << " | textura: " << texture.file << std::endl;
     if (texture.texID != 0) {
         glEnable(GL_TEXTURE_2D);
         
