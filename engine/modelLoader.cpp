@@ -15,8 +15,8 @@ bool Model::loadTexture() {
 
     // !!!!!!!!!!!!!!!utilizar o path de testes ou demos consoante o caso!!!!!!!!!!!!!!!!!
 
-    //std::string path = "../test files/test_files_phase_4/" + texture.file;
-    std::string path = "../demo_models/" + texture.file;
+    std::string path = "../test files/test_files_phase_4/" + texture.file;
+    //std::string path = "../demo_models/" + texture.file;
     if (!ilLoadImage((ILstring)path.c_str())) {
         std::cerr << "Erro ao carregar textura: " << texture.file << std::endl;
         return false;

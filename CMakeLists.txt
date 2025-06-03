@@ -5,6 +5,18 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -arch arm64")
 
+# Detectar e definir SDK correto automaticamente no macOS
+if(APPLE)
+    execute_process(
+        COMMAND xcrun --sdk macosx --show-sdk-path
+        OUTPUT_VARIABLE CMAKE_OSX_SYSROOT
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+    )
+    message(STATUS "Using macOS SDK at: ${CMAKE_OSX_SYSROOT}")
+    set(CMAKE_OSX_SYSROOT ${CMAKE_OSX_SYSROOT} CACHE STRING "macOS SDK path")
+endif()
+
+
 # Diretórios de código-fonte
 set(SRC_ENGINE engine)
 set(SRC_GENERATOR generator)
